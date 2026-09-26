@@ -1,46 +1,106 @@
 <?php
 
-class User
+require_once __DIR__ . '/../core/Model.php';
+
+class User extends Model
 {
-    private $db;
-
-    public function __construct($db)
-    {
-        $this->db = $db;
-    }
-
-    public function create($firstName, $lastName, $email, $password, $location = null, $description = null, $occupation = null)
-    {
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        $sql = "INSERT INTO users 
+    public function create(
+        string $firstName,
+        string $lastName,
+        string $email,
+        string $password,
+        ?string $location = null,
+        ?string $description = null,
+        ?string $occupation = null
+    ): bool {
+        $sql = "INSERT INTO users
                 (first_name, last_name, email, password, location, description, occupation)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+                VALUES
+                (:firstName, :lastName, :email, :password, :location, :description, :occupation)";
 
-        $stmt = $this->db->prepare($sql);
+        $statement = $this->db->prepare($sql);
 
-        $stmt->bind_param(
-            "sssssss",
-            $firstName,
-            $lastName,
-            $email,
-            $hashedPassword,
-            $location,
-            $description,
-            $occupation
-        );
-
-        return $stmt->execute();
+        return $statement->execute([
+            ':firstName' => $firstName,
+            ':lastName' => $lastName,
+            ':email' => $email,
+            ':password' => $password,
+            ':location' => $location,
+            ':description' => $description,
+            ':occupation' => $occupation
+        ]);
     }
 
-    public function findByEmail($email)
+    public function findByEmail(string $email): ?array
     {
-        $sql = "SELECT * FROM users WHERE email = ?";
+        $sql = "SELECT *
+                FROM users
+                WHERE email = :email
+                LIMIT 1";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
+        $statement = $this->db->prepare($sql);
+        $statement->execute([
+            ':email' => $email
+        ]);
 
-        return $stmt->get_result()->fetch_assoc();
+        $user = $statement->fetch();
+
+        return $user ?: null;
+    }
+
+    public function findById(int $id): ?array
+    {
+        $sql = "SELECT *
+                FROM users
+                WHERE id = :id
+                LIMIT 1";
+
+        $statement = $this->db->prepare($sql);
+        $statement->execute([
+            ':id' => $id
+        ]);
+
+        $user = $statement->fetch();
+
+        return $user ?: null;
+    }
+
+    public function emailExists(string $email): bool
+    {
+        $sql = "SELECT id
+                FROM users
+                WHERE email = :email
+                LIMIT 1";
+
+        $statement = $this->db->prepare($sql);
+        $statement->execute([
+            ':email' => $email
+        ]);
+
+        return $statement->fetch() !== false;
+    }
+
+    public function getFirstName(int $id): ?string
+    {
+        $sql = "SELECT first_name
+                FROM users
+                WHERE id = :id
+                LIMIT 1";
+
+        $statement = $this->db->prepare($sql);
+        $statement->execute([
+            ':id' => $id
+        ]);
+
+        $user = $statement->fetch();
+
+        return $user ? $user['first_name'] : null;
+    }
+
+    public function count(): int
+    {
+        $statement = $this->db->query("SELECT COUNT(*) FROM users");
+
+        return (int) $statement->fetchColumn();
     }
 }

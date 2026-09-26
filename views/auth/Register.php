@@ -1,47 +1,174 @@
+<?php
+
+$errors = $errors ?? [];
+$old = $old ?? [];
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب | الذكريات</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="/Photo-sharing-application/public/css/style.css">
 </head>
 
 <body>
 
-    <h2>Create Account</h2>
+<nav class="navbar navbar-expand-lg navbar-dark main-navbar">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/Photo-sharing-application/public/">
+            الذكريات
+        </a>
 
-    <form method="POST" action="/Photo-sharing-application/Controller/UserController.php">
+        <div class="ms-auto">
+            <a
+                href="/Photo-sharing-application/public/login"
+                class="btn btn-outline-light"
+            >
+                تسجيل الدخول
+            </a>
+        </div>
+    </div>
+</nav>
 
-        <label>First Name:</label>
-        <input type="text" name="first_name" required>
-        <br><br>
+<main class="auth-page">
+    <div class="container">
+        <div class="auth-card">
 
-        <label>Last Name:</label>
-        <input type="text" name="last_name" required>
-        <br><br>
+            <div class="text-center mb-4">
+                <h1>إنشاء حساب</h1>
+                <p>انضمي إلى الذكريات وابدئي بمشاركة صورك.</p>
+            </div>
 
-        <label>Email:</label>
-        <input type="email" name="email" required>
-        <br><br>
+            <?php if (!empty($errors)): ?>
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        <?php foreach ($errors as $error): ?>
+                            <li><?= htmlspecialchars($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
 
-        <label>Password:</label>
-        <input type="password" name="password" required>
-        <br><br>
+            <form
+                method="POST"
+                action="/Photo-sharing-application/public/register"
+                id="registerForm"
+                novalidate
+            >
 
-        <label>Location:</label>
-        <input type="text" name="location">
-        <br><br>
+                <div class="row g-3">
 
-        <label>Description:</label>
-        <textarea name="description"></textarea>
-        <br><br>
+                    <div class="col-md-6">
+                        <label class="form-label">الاسم الأول</label>
+                        <input
+                            type="text"
+                            name="first_name"
+                            class="form-control"
+                            value="<?= htmlspecialchars($old['first_name'] ?? '') ?>"
+                            minlength="2"
+                            maxlength="50"
+                            required
+                        >
+                    </div>
 
-        <label>Occupation:</label>
-        <input type="text" name="occupation">
-        <br><br>
+                    <div class="col-md-6">
+                        <label class="form-label">اسم العائلة</label>
+                        <input
+                            type="text"
+                            name="last_name"
+                            class="form-control"
+                            value="<?= htmlspecialchars($old['last_name'] ?? '') ?>"
+                            minlength="2"
+                            maxlength="50"
+                            required
+                        >
+                    </div>
 
-        <button type="submit" name="register">Register</button>
+                    <div class="col-12">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <input
+                            type="email"
+                            name="email"
+                            class="form-control"
+                            value="<?= htmlspecialchars($old['email'] ?? '') ?>"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
 
-    </form>
+                    <div class="col-12">
+                        <label class="form-label">كلمة المرور</label>
+                        <input
+                            type="password"
+                            name="password"
+                            class="form-control"
+                            minlength="8"
+                            required
+                        >
+                        <small class="text-muted">
+                            8 أحرف على الأقل.
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">الموقع</label>
+                        <input
+                            type="text"
+                            name="location"
+                            class="form-control"
+                            maxlength="100"
+                            value="<?= htmlspecialchars($old['location'] ?? '') ?>"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">المهنة</label>
+                        <input
+                            type="text"
+                            name="occupation"
+                            class="form-control"
+                            maxlength="100"
+                            value="<?= htmlspecialchars($old['occupation'] ?? '') ?>"
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">نبذة عنك</label>
+                        <textarea
+                            name="description"
+                            class="form-control"
+                            rows="4"
+                        ><?= htmlspecialchars($old['description'] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn main-btn w-100">
+                            إنشاء الحساب
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
+            <p class="text-center mt-4 mb-0">
+                لديك حساب؟
+                <a href="/Photo-sharing-application/public/login">
+                    تسجيل الدخول
+                </a>
+            </p>
+
+        </div>
+    </div>
+</main>
+
+<script src="/Photo-sharing-application/public/js/validation.js"></script>
 
 </body>
 </html>
